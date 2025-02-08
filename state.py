@@ -35,9 +35,12 @@ class State:
 
     def not_seen(self):
         not_seen = np.full(10, self.decks * 4)
+        not_seen[-1] = self.decks * 16
         return not_seen - self.seen
 
     def update_hand(self, player, dealer):
+        player = [10 if card > 10 else card for card in player]
+        dealer = [10 if card > 10 else card for card in dealer]
         for card in player:
             self.seen[card - 1] += 1
         for card in dealer:

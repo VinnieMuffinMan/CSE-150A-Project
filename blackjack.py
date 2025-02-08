@@ -3,7 +3,8 @@ from bj_utils import score
 
 
 class Blackjack:
-    def __init__(self, decks=8, pen=0.8125, burn=False):
+    def __init__(self, decks=8, pen=0.8125, burn=False, seed = 0):
+        random.seed(seed)
         self.deck = Deck(decks=decks)
         self.deck.shuffle()
         self.player = []
@@ -11,6 +12,8 @@ class Blackjack:
         self.player_bal = 0
 
     def deal(self):
+        self.player = []
+        self.dealer = []
         self.player.append(self.deck.draw())
         self.dealer.append(self.deck.draw())
         self.player.append(self.deck.draw())
@@ -65,8 +68,6 @@ class Blackjack:
             print("Shuffling...")
             self.deck.shuffle()
 
-        self.player = []
-        self.dealer = []
         self.deal()
         print(f"Player: {self.player} ({self.player_score()})")
         if self.player_score() == 21:
