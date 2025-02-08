@@ -1,4 +1,5 @@
 import random
+from bj_utils import score
 
 
 class Blackjack:
@@ -15,24 +16,12 @@ class Blackjack:
         self.player.append(self.deck.draw())
         self.dealer.append(self.deck.draw())
 
-    def __score(self, hand):
-        ace = 0
-        score = 0
-        for card in hand:
-            if card == 1:
-                ace += 1
-            score += 11 if card == 1 else min(card, 10)
-        while ace > 0 and score > 21:
-            score -= 10
-            ace -= 1
-        return score, ace
-
     def player_score(self):
-        score, _ = self.__score(self.player)
+        score, _ = score(self.player)
         return score
 
     def dealer_score(self):
-        score, _ = self.__score(self.dealer)
+        score, _ = score(self.dealer)
         return score
 
     def player_draw(self):
@@ -43,7 +32,7 @@ class Blackjack:
             self.dealer.append(self.deck.draw())
 
     def dealer_soft(self):
-        _, ace = self.__score(self.dealer)
+        _, ace = score(self.dealer)
         return ace > 0
 
     def cards_left(self):
