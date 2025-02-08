@@ -26,12 +26,12 @@ class State:
         return 52 * self.decks - self.burn - seen_count
 
     def player_score(self):
-        score, _ = score(self.player_hand)
-        return score
+        sc, _ = score(self.player_hand)
+        return sc
 
     def dealer_score(self):
-        score, _ = score(self.dealer_hand)
-        return score
+        sc, _ = score(self.dealer_hand)
+        return sc
 
     def not_seen(self):
         not_seen = np.full(10, self.decks * 4)

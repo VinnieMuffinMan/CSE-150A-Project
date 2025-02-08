@@ -17,12 +17,12 @@ class Blackjack:
         self.dealer.append(self.deck.draw())
 
     def player_score(self):
-        score, _ = score(self.player)
-        return score
+        sc, _ = score(self.player)
+        return sc
 
     def dealer_score(self):
-        score, _ = score(self.dealer)
-        return score
+        sc, _ = score(self.dealer)
+        return sc
 
     def player_draw(self):
         self.player.append(self.deck.draw())
