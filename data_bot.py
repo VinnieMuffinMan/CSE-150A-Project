@@ -1,0 +1,111 @@
+import numpy as np
+from bj_utils import score
+from blackjack import Deck
+from state import State
+from tqdm import tqdm
+
+
+def __generate_decks(not_seen, count=100000):
+    num = not_seen.sum()
+    cards = [0] * num
+    i = 0
+    for c, n in enumerate(not_seen):
+        for _ in range(n):
+            cards[i] = c + 1
+            i += 1
+    decks = [None] * count
+    for i in range(count):
+        d = Deck(cards=cards.copy())
+        d.shuffle()
+        decks[i] = d
+
+    return decks
+
+
+def action(state: State):
+    player_hand = state.player_hand
+    dealer_hand = state.dealer_hand
+    decks = __generate_decks(state.not_seen)
+    num_decks = len(decks)
+    total_value = [0, 0, 0, 0]
+    for d in tqdm(decks):
+        value = analyze(player_hand, dealer_hand.copy(), d)
+        for i, v in enumerate(value):
+            total_value[i] += v
+
+    expected_value = [v / num_decks for v in total_value]
+    return expected_value
+
+
+def analyze(player_hand, dealer_hand, deck: Deck):
+    if dealer_hand[0] == 1:
+        while deck.peek() >= 10:
+            deck.shuffle()
+    if dealer_hand[0] >= 10:
+        while deck.peek() == 1:
+            deck.shuffle()
+    dealer_hand += [deck.draw()]
+    # if len(player_hand) == 2:
+    #     if score(player_hand) == 21:
+    #         if score(dealer_hand) == 21:
+    #             return 0
+    #         return 1.5
+
+    #     if score(dealer_hand) == 21:
+    #         return -1
+
+    split = all((len(player_hand) == 2, player_hand[0] == player_hand[1]))
+
+    deck_pos = deck.pos
+    value_stand = stand(player_hand.copy(), dealer_hand.copy(), deck)
+
+    deck.pos = deck_pos
+    value_hit = hit(player_hand.copy(), dealer_hand.copy(), deck)
+
+    deck.pos = deck_pos
+    value_double = double(player_hand.copy(), dealer_hand.copy(), deck)
+
+    deck.pos = deck_pos
+    value_split = 0
+
+    return (value_stand, value_hit, value_double, value_split)
+
+
+def stand(player_hand, dealer_hand, deck: Deck):
+    player_score, _ = score(player_hand)
+
+    dealer_score, ace = score(dealer_hand)
+    while dealer_score < 17 or (dealer_score == 17 and ace > 0):
+        dealer_hand += [deck.draw()]
+        dealer_score, ace = score(dealer_hand)
+
+    if dealer_score > 21:
+        return 1
+    if dealer_score > player_score:
+        return -1
+    if dealer_score < player_score:
+        return 1
+    return 0
+
+
+def hit(player_hand, dealer_hand, deck: Deck):
+    player_hand += [deck.draw()]
+    player_score, _ = score(player_hand)
+    value = -1
+    while player_score <= 21:
+        stand_val = stand(player_hand, dealer_hand.copy(), deck)
+        if stand_val == 1:
+            return 1
+
+        value = max(value, stand_val)
+        player_hand += [deck.draw()]
+        player_score, _ = score(player_hand)
+
+    return value
+
+
+def double(player_hand, dealer_hand, deck: Deck):
+    player_hand += [deck.draw()]
+    if score(player_hand)[0] > 21:
+        return -2
+    return 2 * stand(player_hand, dealer_hand, deck)

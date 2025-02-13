@@ -3,7 +3,7 @@ from bj_utils import score
 
 
 class Blackjack:
-    def __init__(self, decks=8, pen=0.8125, burn=False, seed = 0):
+    def __init__(self, decks=8, pen=0.8125, burn=False, seed=0):
         random.seed(seed)
         self.deck = Deck(decks=decks)
         self.deck.shuffle()
@@ -109,24 +109,31 @@ class Blackjack:
 
 
 class Deck:
-    def __init__(self, decks=8, pen=0.8125, burn=False):
-        self.cards = []
+    def __init__(self, cards=None, decks=8, pen=0.8125, burn=False):
+        if not cards:
+            cards = []
+        self.cards = cards
         self.decks = decks
         self.pen = pen
         self.burn = burn
         for i in range(1, 14):
             self.cards.extend([i] * 4 * decks)
+        self.pos = 52 * self.decks - 1
 
     def shuffle(self, burn=False):
         random.shuffle(self.cards)
         if burn:
-            self.cards.pop()
+            self.draw()
 
     def draw(self):
-        return self.cards.pop()
+        self.pos -= 1
+        return self.cards[self.pos + 1]
+
+    def peek(self):
+        return self.cards[self.pos]
 
     def __len__(self):
-        return len(self.cards)
+        return self.pos + 1
 
     def check(self):
         return len(self) < 52 * self.decks * 0.8125
