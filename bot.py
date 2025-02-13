@@ -41,7 +41,7 @@ def __dealer_sim(hand, not_seen):
 def expected_value_stand(state):  # assume no blackjack
     player_score = state.player_score()
 
-    not_seen = state.not_seen()
+    not_seen = state.not_seen
 
     card_dist = not_seen / not_seen.sum()
     if state.dealer_hand[0] == 10:
@@ -112,8 +112,8 @@ def __ev_hit(player, dealer, not_seen, depth):
     return hit_ev
 
 
-def expected_value_hit(state, depth = 5):
-    not_seen = state.not_seen()
+def expected_value_hit(state, depth=5):
+    not_seen = state.not_seen
 
     card_dist = not_seen / not_seen.sum()
     if state.dealer_hand[0] >= 10:
@@ -130,10 +130,28 @@ def expected_value_hit(state, depth = 5):
         not_seen[c] -= 1
         ev += (
             __ev_hit_stand(
-                state.player_hand, state.dealer_hand + [c + 1], not_seen, depth, hit=True
+                state.player_hand,
+                state.dealer_hand + [c + 1],
+                not_seen,
+                depth,
+                hit=True,
             )
             * p
         )
         not_seen[c] += 1
 
     return ev
+
+
+def expected_value_double(state):
+    return 2 * expected_value_hit(state, depth=1)
+
+
+def expected_value_surrender():
+    return -0.5
+
+
+def expected_value_spit(state):
+    if state.player_hand[0] != state.player_hand[1]:
+        raise ValueError()
+    

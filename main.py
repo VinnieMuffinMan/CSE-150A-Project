@@ -4,7 +4,7 @@ from state import State
 
 
 if __name__ == "__main__":
-    for i in range(9, 15):
+    for i in range(10):
         game = Blackjack(seed=i)
         game.deal()
         print(game.player)
