@@ -122,6 +122,7 @@ class Deck:
 
     def shuffle(self, burn=False):
         random.shuffle(self.cards)
+        self.pos = 52 * self.decks - 1
         if burn:
             self.draw()
 

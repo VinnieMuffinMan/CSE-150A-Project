@@ -3,9 +3,23 @@ from bj_utils import score
 from blackjack import Deck
 from state import State
 from tqdm import tqdm
+import multiprocessing
+from concurrent.futures import ProcessPoolExecutor
+import time
 
 
-def __generate_decks(not_seen, count=100000):
+def create_and_shuffle_decks(cards, count):
+    decks = [Deck(cards=cards.copy()) for _ in range(count)]
+    for deck in decks:
+        deck.shuffle()
+    return decks
+
+def __generate_decks(not_seen, count=10000, num_workers=None):
+    start_time = time.time()
+
+    if num_workers is None:
+        num_workers = multiprocessing.cpu_count()
+
     num = not_seen.sum()
     cards = [0] * num
     i = 0
@@ -13,11 +27,17 @@ def __generate_decks(not_seen, count=100000):
         for _ in range(n):
             cards[i] = c + 1
             i += 1
-    decks = [None] * count
-    for i in range(count):
-        d = Deck(cards=cards.copy())
-        d.shuffle()
-        decks[i] = d
+
+    chunk_size = max(1, count // num_workers)
+    chunk_sizes = [chunk_size] * (count // chunk_size) + ([count % chunk_size] if count % chunk_size else [])
+
+    with ProcessPoolExecutor(max_workers=num_workers) as executor:
+        shuffled_chunks = list(executor.map(create_and_shuffle_decks, [cards] * len(chunk_sizes), chunk_sizes))
+
+    decks = [deck for chunk in shuffled_chunks for deck in chunk]
+
+    end_time = time.time()
+    print(f"Execution time: {end_time - start_time:.2f} seconds using {num_workers} cores")
 
     return decks
 
