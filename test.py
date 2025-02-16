@@ -7,9 +7,11 @@ from state import State
 class TestBlackjackEV(unittest.TestCase):
     def test_expected_values(self):
         test_cases = {
-            0: (-0.5368065088280378, -0.4080431269704462),
-            1: (-0.5402939136195947, -0.34279455713803053),
-            3: (-0.5398232925468964, -0.3431091660924308),
+            1: (-0.5113538599846008, -0.19648142835425353),
+            3: (0.19538824630840795, -0.612792945312413),
+            4: (-0.119351548497642, 0.35304316118886636),
+            5: (-0.47619322088841776, -0.40702352260419256),
+            6: (0.39819612589651554, -0.5882976232377854),
         }
 
         for seed, (expected_stand_ev, expected_hit_ev) in test_cases.items():
@@ -31,6 +33,7 @@ class TestBlackjackEV(unittest.TestCase):
                 print("Dealer Hand:", dealer_hand)
                 print("Stand EV:", stand_ev)
                 print("Hit EV:", hit_ev)
+                print("__________________________________________")
 
                 self.assertAlmostEqual(stand_ev, expected_stand_ev, places=6)
                 self.assertAlmostEqual(hit_ev, expected_hit_ev, places=6)

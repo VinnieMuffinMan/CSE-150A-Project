@@ -1,11 +1,12 @@
 import random
+
+import numpy as np
 from bj_utils import score
 
 
 class Blackjack:
-    def __init__(self, decks=8, pen=0.8125, burn=False, seed=0):
-        random.seed(seed)
-        self.deck = Deck(decks=decks)
+    def __init__(self, decks=8, pen=0.8125, burn=False, seed=None):
+        self.deck = Deck(decks=decks, seed=seed)
         self.deck.shuffle()
         self.player = []
         self.dealer = []
@@ -109,32 +110,46 @@ class Blackjack:
 
 
 class Deck:
-    def __init__(self, cards=None, decks=8, pen=0.8125, burn=False):
-        if not cards:
-            cards = []
+    def __init__(self, cards=None, decks=8, pen=0.8125, burn=False, seed=None):
+        if cards is None:
+            cards = np.array([i for i in range(1, 14) for _ in range(4 * decks)])
+        else:
+            cards = np.array(cards)
+        if seed is not None:
+            np.random.seed(seed)
         self.cards = cards
         self.decks = decks
         self.pen = pen
         self.burn = burn
-        for i in range(1, 14):
-            self.cards.extend([i] * 4 * decks)
         self.pos = 52 * self.decks - 1
 
     def shuffle(self, burn=False):
-        random.shuffle(self.cards)
-        self.pos = 52 * self.decks - 1
+        np.random.shuffle(self.cards)
+        self.pos = len(self.cards) - 1
         if burn:
             self.draw()
 
     def draw(self):
+        if self.pos < 0:
+            raise IndexError("No cards left in the deck.")
+        card = self.cards[self.pos]
         self.pos -= 1
-        return self.cards[self.pos + 1]
+        return card
 
     def peek(self):
+        if self.pos < 0:
+            raise IndexError("No cards left in the deck.")
         return self.cards[self.pos]
 
     def __len__(self):
         return self.pos + 1
 
     def check(self):
-        return len(self) < 52 * self.decks * 0.8125
+        return len(self) < len(self.cards) * self.pen
+
+
+def remaining_cards(self):
+    unique, counts = np.unique(self.cards[: self.pos + 1], return_counts=True)
+    card_counts = np.zeros(13, dtype=int)
+    card_counts[unique - 1] = counts
+    return card_counts
