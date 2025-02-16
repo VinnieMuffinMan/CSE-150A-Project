@@ -146,10 +146,3 @@ class Deck:
 
     def check(self):
         return len(self) < len(self.cards) * self.pen
-
-
-def remaining_cards(self):
-    unique, counts = np.unique(self.cards[: self.pos + 1], return_counts=True)
-    card_counts = np.zeros(13, dtype=int)
-    card_counts[unique - 1] = counts
-    return card_counts
