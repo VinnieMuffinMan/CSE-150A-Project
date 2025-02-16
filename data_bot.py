@@ -47,7 +47,7 @@ def __generate_decks(not_seen, count=1000000, num_workers=None):
 
 def action(state: State):
     player_hand = state.player_hand
-    split = player_hand[0] == player_hand[1]
+    can_split = player_hand[0] == player_hand[1]
     dealer_hand = state.dealer_hand
     decks = __generate_decks(state.not_seen)
     num_decks = len(decks)
@@ -55,7 +55,7 @@ def action(state: State):
     deck_its = 3
     for d in tqdm(decks):
         for _ in range(deck_its):
-            value = analyze(player_hand, dealer_hand.copy(), d, split=split)
+            value = analyze(player_hand, dealer_hand.copy(), d, can_split=can_split)
             for i, v in enumerate(value):
                 total_value[i] += v
         d.draw()
@@ -70,7 +70,7 @@ def action(state: State):
     return rec, expected_value
 
 
-def analyze(player_hand, dealer_hand, deck: Deck, split=False):
+def analyze(player_hand, dealer_hand, deck: Deck, can_split=False):
     if dealer_hand[0] == 1:
         while deck.peek() >= 10:
             deck.shuffle()
@@ -80,17 +80,17 @@ def analyze(player_hand, dealer_hand, deck: Deck, split=False):
     dealer_hand += [deck.draw()]
 
     deck_pos = deck.pos
-    value_stand = stand(player_hand.copy(), dealer_hand.copy(), deck)
+    value_stand = stand(player_hand, dealer_hand, deck)
 
     deck.pos = deck_pos
-    value_hit = hit(player_hand.copy(), dealer_hand.copy(), deck)
+    value_hit = hit(player_hand, dealer_hand, deck)
 
     deck.pos = deck_pos
-    value_double = double(player_hand.copy(), dealer_hand.copy(), deck)
+    value_double = double(player_hand, dealer_hand, deck)
 
     deck.pos = deck_pos
-    if split:
-        ...
+    if can_split:
+        value_split = split(player_hand, dealer_hand, deck)
     else:
         value_split = -1000
 
@@ -98,10 +98,11 @@ def analyze(player_hand, dealer_hand, deck: Deck, split=False):
 
 
 def stand(player_hand, dealer_hand, deck: Deck):
+    dealer_hand = dealer_hand.copy()
     player_score, _ = score(player_hand)
 
     dealer_score, ace = score(dealer_hand)
-    while dealer_score < 17 or (dealer_score == 17 and ace > 0):
+    while dealer_score < 17 or (dealer_score == 17 and ace):
         dealer_hand += [deck.draw()]
         dealer_score, ace = score(dealer_hand)
 
@@ -114,7 +115,9 @@ def stand(player_hand, dealer_hand, deck: Deck):
     return 0
 
 
-def hit(player_hand, dealer_hand, deck: Deck):
+def hit(player_hand, dealer_hand, deck: Deck, preserve=True):
+    if preserve:
+        player_hand = player_hand.copy()
     player_hand += [deck.draw()]
     if score(player_hand)[0] > 21:
         return -1
@@ -125,6 +128,7 @@ def hit(player_hand, dealer_hand, deck: Deck):
     return stand(player_hand, dealer_hand, deck)
 
 
+# Basic heuristic for repeated hit calculations
 def hit_heuristic(player_hand, dealer_hand, deck: Deck):
     player_score, ace = score(player_hand)
     dealer_card = dealer_hand[0]
@@ -139,7 +143,34 @@ def hit_heuristic(player_hand, dealer_hand, deck: Deck):
 
 
 def double(player_hand, dealer_hand, deck: Deck):
+    player_hand = player_hand.copy()
     player_hand += [deck.draw()]
     if score(player_hand)[0] > 21:
         return -2
     return 2 * stand(player_hand, dealer_hand, deck)
+
+
+def split(player_hand, dealer_hand, deck: Deck):
+    player_hand_1 = [player_hand[0]]
+    player_hand_2 = [player_hand[1]]
+    player_hand_1 += [deck.draw()]
+    player_hand_2 += [deck.draw()]
+
+    ev = 0
+    # No drawing on split aces
+    if player_hand_1[0] == 1:
+        ev += stand(player_hand_1, dealer_hand, deck)
+        ev += stand(player_hand_2, dealer_hand, deck)
+        return ev
+
+    if hit_heuristic(player_hand_1, dealer_hand, deck):
+        ev += hit(player_hand_1, dealer_hand, deck, preserve=False)
+    else:
+        ev += stand(player_hand_1, dealer_hand, deck)
+
+    if hit_heuristic(player_hand_2, dealer_hand, deck):
+        ev += hit(player_hand_2, dealer_hand, deck, preserve=False)
+    else:
+        ev += stand(player_hand_2, dealer_hand, deck)
+
+    return ev
