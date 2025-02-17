@@ -118,6 +118,7 @@ class Blackjack:
                 if self.player[0] == 1:
                     print("Stand on ace")
                     self.split_acts[i] = 1
+                    i += 1
                     continue
                 while True:
                     if i < self.split_limit:
