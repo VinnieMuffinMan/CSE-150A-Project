@@ -7,6 +7,9 @@ class Blackjack:
         self.deck = Deck(decks=decks, seed=seed)
         self.deck.shuffle()
         self.player = []
+        self.split_limit = 3
+        self.split_hands = []
+        self.split_acts = [0] * (self.split_limit + 1)
         self.dealer = []
         self.bal = bal
         self.bet = 1
@@ -14,6 +17,7 @@ class Blackjack:
     def deal(self):
         self.player = []
         self.dealer = []
+        self.split_hands = []
         self.player.append(self.deck.draw())
         self.dealer.append(self.deck.draw())
         self.player.append(self.deck.draw())
@@ -40,6 +44,11 @@ class Blackjack:
         self.bal -= self.bet
         return self.player_draw()
 
+    def split(self):
+        self.bal -= self.bet
+        self.split_hands.append([self.player[0]])
+        self.split_hands.append([self.player[0]])
+
     def surrender(self):
         self.bal += 0.5 * self.bet
 
@@ -57,6 +66,7 @@ class Blackjack:
                 self.double()
                 return 2
             case "split":
+                self.split()
                 return 3
             case "surrender":
                 return -1
@@ -98,6 +108,51 @@ class Blackjack:
                 break
             print(f"Player: {self.player} ({self.player_score()[0]})")
             print(f"Dealer: {self.dealer[0]}")
+
+        if act == 3:
+            i = 0
+            while i < len(self.split_hands):
+                self.player = self.split_hands[i]
+                self.hit()
+                print(f"Hand {i+1}: {self.player} ({self.player_score()[0]})")
+                if self.player[0] == 1:
+                    print("Stand on ace")
+                    self.split_acts[i] = 1
+                    continue
+                while True:
+                    if i < self.split_limit:
+                        action = input("Action (hit, stand, double, split): ")
+                    else:
+                        action = input("Action (hit, stand, double): ")
+                    act = self.player_action(action)
+                    if act != 0:
+                        break
+                    print(f"Hand {i+1}: {self.player} ({self.player_score()[0]})")
+                    print(f"Dealer: {self.dealer}")
+                self.split_acts[i] = act
+                i += 1
+
+            dealer_drawn = False
+            for i in range(len(self.split_hands)):
+                self.player = self.split_hands[i]
+                print(f"Hand {i+1}: {self.player} ({self.player_score()[0]})")
+
+                end = self.end_check(self.split_acts[i], dealer_drawn=dealer_drawn)
+                dealer_drawn = True
+                print(f"Dealer: {self.dealer} ({self.dealer_score()[0]})")
+
+                match end:
+                    case 0:
+                        print("Player wins.")
+                    case 1:
+                        print("Dealer wins.")
+                    case 2:
+                        print("It's a tie.")
+                    case 3:
+                        print("Player busts! Dealer wins.")
+                    case 4:
+                        print("Dealer busts! Player wins.")
+            return
 
         if act == -1:
             print("Surrender.")
@@ -151,7 +206,7 @@ class Blackjack:
             return 2
         return 0
 
-    def end_check(self, act):
+    def end_check(self, act, dealer_drawn=False):
         """
         Checks winner of the game.
 
@@ -162,8 +217,8 @@ class Blackjack:
         if player_score > 21:
             print("Player busts! Dealer wins.")
             return 3
-
-        self.dealer_action()
+        if not dealer_drawn:
+            self.dealer_action()
         dealer_score, _ = self.dealer_score()
 
         if dealer_score > 21:

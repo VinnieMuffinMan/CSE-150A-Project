@@ -9,7 +9,7 @@ if __name__ == "__main__":
     # seeds = [12]
     # seeds = [17]
     # for i in seeds:
-    game = Blackjack(seed=17)
+    game = Blackjack(seed=12)
     #     game.deal()
     #     print(game.player)
     #     print(game.dealer)
