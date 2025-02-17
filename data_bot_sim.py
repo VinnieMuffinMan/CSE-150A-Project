@@ -17,6 +17,8 @@ def simulate(seed=None):
         state.update_hand(game.player, game.dealer[:1])
 
         start = game.start_check()
+        if start != 0:
+            state.update_dealer_hand(game.dealer[1:])
         if start == 1:
             print(f"Dealer: {game.dealer}")
             print("Player blackjack.")
@@ -74,7 +76,7 @@ def simulate(seed=None):
                 print("Dealer busts! Player wins.")
         state.update_dealer_hand(game.dealer[1:])
         
-    print("Total gain:", game.bal)
+    print(f"Won {game.bal} over {num_games} games.")
 
 if __name__ == "__main__":
     simulate(seed=17)
