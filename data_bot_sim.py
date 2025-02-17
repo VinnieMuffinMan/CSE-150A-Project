@@ -146,4 +146,4 @@ def simulate(seed=None):
 
 
 if __name__ == "__main__":
-    simulate(seed=519)
+    simulate(seed=0)
