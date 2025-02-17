@@ -15,7 +15,7 @@ def create_and_shuffle_decks(cards, count):
     return decks
 
 
-def __generate_decks(not_seen, count=1000000, num_workers=None):
+def __generate_decks(not_seen, count=100000, num_workers=None):
     start_time = time.time()
 
     if num_workers is None:
@@ -48,6 +48,7 @@ def __generate_decks(not_seen, count=1000000, num_workers=None):
 def action(state: State):
     player_hand = state.player_hand
     can_split = player_hand[0] == player_hand[1]
+    can_double = len(player_hand) == 2
     dealer_hand = state.dealer_hand
     decks = __generate_decks(state.not_seen)
     num_decks = len(decks)
@@ -55,7 +56,7 @@ def action(state: State):
     deck_its = 3
     for d in tqdm(decks):
         for _ in range(deck_its):
-            value = analyze(player_hand, dealer_hand.copy(), d, can_split=can_split)
+            value = analyze(player_hand, dealer_hand.copy(), d,can_double=can_double, can_split=can_split)
             for i, v in enumerate(value):
                 total_value[i] += v
         d.draw()
@@ -70,7 +71,7 @@ def action(state: State):
     return rec, expected_value
 
 
-def analyze(player_hand, dealer_hand, deck: Deck, can_split=False):
+def analyze(player_hand, dealer_hand, deck: Deck, can_double=True, can_split=False):
     if dealer_hand[0] == 1:
         while deck.peek() >= 10:
             deck.shuffle()
@@ -86,7 +87,10 @@ def analyze(player_hand, dealer_hand, deck: Deck, can_split=False):
     value_hit = hit(player_hand, dealer_hand, deck)
 
     deck.pos = deck_pos
-    value_double = double(player_hand, dealer_hand, deck)
+    if can_double:
+        value_double = double(player_hand, dealer_hand, deck)
+    else:
+        value_double = -1000
 
     deck.pos = deck_pos
     if can_split:

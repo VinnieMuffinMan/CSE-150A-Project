@@ -29,7 +29,9 @@ class Blackjack:
         return sc
 
     def player_draw(self):
-        self.player.append(self.deck.draw())
+        card = self.deck.draw()
+        self.player.append(card)
+        return card
 
     def dealer_draw(self):
         while self.dealer_score() < 17:

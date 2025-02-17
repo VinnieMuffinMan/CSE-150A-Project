@@ -43,3 +43,9 @@ class State:
             self.not_seen[card - 1] -= 1
         self.player_hand = player
         self.dealer_hand = dealer
+
+    def update_player_hand(self, card):
+        card = 10 if card > 10 else card
+        self.player_hand.append(card)
+        self.not_seen[card - 1] -= 1
+        
