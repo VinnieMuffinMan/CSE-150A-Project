@@ -15,11 +15,11 @@ def create_and_shuffle_decks(cards, count):
     return decks
 
 
-def __generate_decks(not_seen, count=10000, num_workers=None):
+def __generate_decks(not_seen, count=5000, num_workers=None):
     start_time = time.time()
 
     if num_workers is None:
-        num_workers = multiprocessing.cpu_count()
+        num_workers = max(multiprocessing.cpu_count(), count//10000)
 
     cards = np.repeat(np.arange(1, len(not_seen) + 1), not_seen)
 
