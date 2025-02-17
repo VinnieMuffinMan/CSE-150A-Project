@@ -1,16 +1,18 @@
 from blackjack import Blackjack
 from data_bot import action
 from state import State
-
+import matplotlib.pyplot as plt
 
 def simulate(seed=None):
     game = Blackjack(seed=seed)
     state = State(burn=False)
     num_games = 200
+    games, bals = range(num_games + 1), []
     for i in range(num_games):
         print("_" * 50)
         print(f"Game {i+1}")
         print("Bal:", game.bal)
+        bals.append(game.bal)
         if game.check_deck_pen():
             print("Shuffling...")
             state.not_seen_reset()
@@ -143,7 +145,12 @@ def simulate(seed=None):
         state.update_dealer_hand(game.dealer[1:])
 
     print(f"Won {game.bal} over {num_games} games.")
-
+    bals.append(game.bal)
+    plt.plot(games, bals)
+    plt.xlabel('Games')
+    plt.ylabel('Balance')
+    plt.title(f'Blackjack Balance (Seed {seed})')
+    plt.savefig(f'balance_seed_{seed}.png')
 
 if __name__ == "__main__":
     simulate(seed=0)
