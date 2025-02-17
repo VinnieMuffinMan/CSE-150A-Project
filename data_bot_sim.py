@@ -3,10 +3,10 @@ from data_bot import action
 from state import State
 import matplotlib.pyplot as plt
 
-def simulate(seed=None):
+
+def simulate(seed=None,num_games=100):
     game = Blackjack(seed=seed)
     state = State(burn=False)
-    num_games = 200
     games, bals = range(num_games + 1), []
     for i in range(num_games):
         print("_" * 50)
@@ -97,7 +97,7 @@ def simulate(seed=None):
                     print(f"Hand {i+1}: {game.player} ({game.player_score()[0]})")
                     print(f"Dealer: {game.dealer[0]}")
                 i += 1
-            
+
             dealer_drawn = False
             for i in range(len(game.split_hands)):
                 game.player = game.split_hands[i]
@@ -147,10 +147,11 @@ def simulate(seed=None):
     print(f"Won {game.bal} over {num_games} games.")
     bals.append(game.bal)
     plt.plot(games, bals)
-    plt.xlabel('Games')
-    plt.ylabel('Balance')
-    plt.title(f'Blackjack Balance (Seed {seed})')
-    plt.savefig(f'balance_seed_{seed}.png')
+    plt.xlabel("Games")
+    plt.ylabel("Balance")
+    plt.title(f"Blackjack Balance (Seed {seed}, Games {num_games})")
+    plt.savefig(f"balance_seed_{seed}_games_{num_games}.png")
+
 
 if __name__ == "__main__":
-    simulate(seed=0)
+    simulate(seed=0, num_games=500)
