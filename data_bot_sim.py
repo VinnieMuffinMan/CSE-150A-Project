@@ -11,6 +11,9 @@ def simulate(seed=None):
         print("_" * 50)
         print(f"Game {i+1}")
         print("Bal:", game.bal)
+        if game.check_deck_pen():
+            print("Shuffling...")
+            state.not_seen_reset()
         game.deal()
         print(game.player)
         print(game.dealer)
@@ -113,6 +116,7 @@ def simulate(seed=None):
                         print("Player busts! Dealer wins.")
                     case 4:
                         print("Dealer busts! Player wins.")
+            state.update_dealer_hand(game.dealer[1:])
             continue
 
         if act == "surrender":
