@@ -90,7 +90,7 @@ def analyze(player_hand, dealer_hand, deck: Deck, can_split=False):
 
     deck.pos = deck_pos
     if can_split:
-        value_split = split(player_hand, dealer_hand, deck)
+        value_split = split(player_hand, dealer_hand, deck, [3])
     else:
         value_split = -1000
 
@@ -150,25 +150,32 @@ def double(player_hand, dealer_hand, deck: Deck):
     return 2 * stand(player_hand, dealer_hand, deck)
 
 
-def split(player_hand, dealer_hand, deck: Deck):
+def split(player_hand, dealer_hand, deck: Deck, split_left=None):
+    if split_left is None:
+        split_left = [3]
     player_hand_1 = [player_hand[0]]
     player_hand_2 = [player_hand[1]]
     player_hand_1 += [deck.draw()]
     player_hand_2 += [deck.draw()]
+    split_left[0] -= 1
 
     ev = 0
-    # No drawing on split aces
+    # No drawing or splitting on split aces
     if player_hand_1[0] == 1:
         ev += stand(player_hand_1, dealer_hand, deck)
         ev += stand(player_hand_2, dealer_hand, deck)
         return ev
 
-    if hit_heuristic(player_hand_1, dealer_hand, deck):
+    if player_hand_1[0] == player_hand_1[1] and split_left[0] > 0:
+        ev += split(player_hand_1, dealer_hand, deck, split_left)
+    elif hit_heuristic(player_hand_1, dealer_hand, deck):
         ev += hit(player_hand_1, dealer_hand, deck, preserve=False)
     else:
         ev += stand(player_hand_1, dealer_hand, deck)
 
-    if hit_heuristic(player_hand_2, dealer_hand, deck):
+    if player_hand_2[0] == player_hand_2[1] and split_left[0] > 0:
+        ev += split(player_hand_1, dealer_hand, deck, split_left)
+    elif hit_heuristic(player_hand_2, dealer_hand, deck):
         ev += hit(player_hand_2, dealer_hand, deck, preserve=False)
     else:
         ev += stand(player_hand_2, dealer_hand, deck)
