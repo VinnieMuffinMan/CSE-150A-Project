@@ -44,14 +44,76 @@ def simulate(seed=None):
             if act == "double":
                 double = game.double()
                 state.update_player_hand(double)
+                print(f"Player: {game.player} ({game.player_score()[0]})")
+                print(f"Dealer: {game.dealer[0]}")
                 break
             if act == "split":
-                print("GUH") # TODO: implement split
+                game.split()
                 break
             if act == "surrender":
                 break
             print(f"Player: {game.player} ({game.player_score()[0]})")
             print(f"Dealer: {game.dealer[0]}")
+
+        if act == "split":
+            i = 0
+            while i < len(game.split_hands):
+                game.player = game.split_hands[i]
+                new = game.hit()
+                state.update_player_hand(new)
+                state.player_hand = game.player.copy()
+                print(f"Hand {i+1}: {game.player} ({game.player_score()[0]})")
+                print(f"Dealer: {game.dealer[0]}")
+                if game.player[0] == 1:
+                    print("Stand on ace")
+                    game.split_acts[i] = 1
+                    i += 1
+                    continue
+                while True:
+                    act, ev = action(state, can_split=i != game.split_limit)
+                    print(ev)
+                    print(act)
+                    if act == "hit":
+                        hit = game.hit()
+                        state.update_player_hand(hit)
+                    if act == "stand":
+                        break
+                    if act == "double":
+                        double = game.double()
+                        state.update_player_hand(double)
+                        print(f"Hand {i+1}: {game.player} ({game.player_score()[0]})")
+                        print(f"Dealer: {game.dealer[0]}")
+                        break
+                    if act == "split":
+                        game.split()
+                        break
+                    if act == "surrender":
+                        break
+                    print(f"Hand {i+1}: {game.player} ({game.player_score()[0]})")
+                    print(f"Dealer: {game.dealer[0]}")
+                i += 1
+            
+            dealer_drawn = False
+            for i in range(len(game.split_hands)):
+                game.player = game.split_hands[i]
+                print(f"Hand {i+1}: {game.player} ({game.player_score()[0]})")
+
+                end = game.end_check(game.split_acts[i], dealer_drawn=dealer_drawn)
+                dealer_drawn = True
+                print(f"Dealer: {game.dealer} ({game.dealer_score()[0]})")
+
+                match end:
+                    case 0:
+                        print("Player wins.")
+                    case 1:
+                        print("Dealer wins.")
+                    case 2:
+                        print("It's a tie.")
+                    case 3:
+                        print("Player busts! Dealer wins.")
+                    case 4:
+                        print("Dealer busts! Player wins.")
+            continue
 
         if act == "surrender":
             game.surrender()
@@ -75,8 +137,9 @@ def simulate(seed=None):
             case 4:
                 print("Dealer busts! Player wins.")
         state.update_dealer_hand(game.dealer[1:])
-        
+
     print(f"Won {game.bal} over {num_games} games.")
 
+
 if __name__ == "__main__":
-    simulate(seed=17)
+    simulate(seed=519)

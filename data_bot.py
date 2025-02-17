@@ -45,18 +45,24 @@ def __generate_decks(not_seen, count=100000, num_workers=None):
     return decks
 
 
-def action(state: State):
+def action(state: State, can_split=True):
     player_hand = state.player_hand
-    can_split = player_hand[0] == player_hand[1]
+    can_split = can_split and player_hand[0] == player_hand[1]
     can_double = len(player_hand) == 2
     dealer_hand = state.dealer_hand
     decks = __generate_decks(state.not_seen)
     num_decks = len(decks)
     total_value = [0, 0, 0, 0]
-    deck_its = 3
+    deck_its = 3  # how many times we use the same deck by just burning the top card
     for d in tqdm(decks):
         for _ in range(deck_its):
-            value = analyze(player_hand, dealer_hand.copy(), d,can_double=can_double, can_split=can_split)
+            value = analyze(
+                player_hand,
+                dealer_hand.copy(),
+                d,
+                can_double=can_double,
+                can_split=can_split,
+            )
             for i, v in enumerate(value):
                 total_value[i] += v
         d.draw()
