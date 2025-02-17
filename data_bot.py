@@ -19,7 +19,7 @@ def __generate_decks(not_seen, count=5000, num_workers=None):
     start_time = time.time()
 
     if num_workers is None:
-        num_workers = max(multiprocessing.cpu_count(), count//10000)
+        num_workers = min(multiprocessing.cpu_count(), count // 10000 + 1)
 
     cards = np.repeat(np.arange(1, len(not_seen) + 1), not_seen)
 
