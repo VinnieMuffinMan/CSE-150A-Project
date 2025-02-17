@@ -6,7 +6,7 @@ from state import State
 def simulate(seed=None):
     game = Blackjack(seed=seed)
     state = State(burn=False)
-    num_games = 6
+    num_games = 200
     for i in range(num_games):
         print("_" * 50)
         print(f"Game {i+1}")

@@ -15,7 +15,7 @@ def create_and_shuffle_decks(cards, count):
     return decks
 
 
-def __generate_decks(not_seen, count=100000, num_workers=None):
+def __generate_decks(not_seen, count=10000, num_workers=None):
     start_time = time.time()
 
     if num_workers is None:
