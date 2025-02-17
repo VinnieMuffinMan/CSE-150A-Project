@@ -33,12 +33,15 @@ class Blackjack:
         self.player.append(card)
         return card
 
-    def player_hit(self):
+    def hit(self):
         return self.player_draw()
 
-    def player_double(self):
+    def double(self):
         self.bal -= self.bet
         return self.player_draw()
+
+    def surrender(self):
+        self.bal += 0.5 * self.bet
 
     def cards_left(self):
         return len(self.deck)
@@ -46,12 +49,12 @@ class Blackjack:
     def player_action(self, action):
         match action:
             case "hit":
-                self.player_hit()
+                self.hit()
                 return 1 if self.player_score()[0] >= 21 else 0
             case "stand":
                 return 1
             case "double":
-                self.player_double()
+                self.double()
                 return 2
             case "split":
                 return 3
@@ -95,6 +98,12 @@ class Blackjack:
                 break
             print(f"Player: {self.player} ({self.player_score()[0]})")
             print(f"Dealer: {self.dealer[0]}")
+
+        if act == -1:
+            print("Surrender.")
+            self.surrender()
+            print(f"Dealer: {self.dealer} ({self.dealer_score()[0]})")
+            return
 
         end = self.end_check(act)
         print(f"Dealer: {self.dealer} ({self.dealer_score()[0]})")
