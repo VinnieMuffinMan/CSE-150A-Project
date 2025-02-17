@@ -17,14 +17,14 @@ Our model can be evaluated by running data_bot_sim.py, which returns the player'
 
 ** Create/Update your README.md to include your new work and updates you have all added. Make sure to upload all code and notebooks. Provide links in your README.md **<br/>
 The following are the main scripts that we implemented throughout the process of building our agent (in chronological order):
-- blackjack.py: This contains the Blackjack class that our agent interacts with to play the game.
-- bj_utils.py: This contains utility functions for our game. So far we have a score function that determines the score of a hand.
-- state.py: This contains the State class that stores the current game state, i.e. the player hand, the dealer hand, and the cards we have not yet seen (for card counting).
-- bot.py: This bot chooses the player's action based on ideal probabilities i.e. not on observations. We would use this to compare with our data-driven agent and determine its accuracy.
-- test.py: This test file ensures that our bot in bot.py outputs the correct expected values.
-- main.py: This file compares the accuracy of our agent to the bot in bot.py.
-- data_bot.py: This contains our utility-based agent which generates the dataset of observations and chooses the action that maximizes earnings based on these observations.
-- data_bot_sim.py: This simulates games for our agent to show its performance measure by outputting the agent's balance after a given number of games.
+- [blackjack.py](https://github.com/VinnieMuffinMan/CSE-150A-Project/blob/main/blackjack.py): This contains the Blackjack class that our agent interacts with to play the game.
+- [bj_utils.py](https://github.com/VinnieMuffinMan/CSE-150A-Project/blob/main/bj_utils.py): This contains utility functions for our game. So far we have a score function that determines the score of a hand.
+- [state.py](https://github.com/VinnieMuffinMan/CSE-150A-Project/blob/main/state.py): This contains the State class that stores the current game state, i.e. the player hand, the dealer hand, and the cards we have not yet seen (for card counting).
+- [bot.py](https://github.com/VinnieMuffinMan/CSE-150A-Project/blob/main/bot.py): This bot chooses the player's action based on ideal probabilities i.e. not on observations. We would use this to compare with our data-driven agent and determine its accuracy.
+- [test.py](https://github.com/VinnieMuffinMan/CSE-150A-Project/blob/main/test.py): This test file ensures that our bot in bot.py outputs the correct expected values.
+- [main.py](https://github.com/VinnieMuffinMan/CSE-150A-Project/blob/main/main.py): This file compares the accuracy of our agent to the bot in bot.py.
+- [data_bot.py](https://github.com/VinnieMuffinMan/CSE-150A-Project/blob/main/data_bot.py): This contains our utility-based agent which generates the dataset of observations and chooses the action that maximizes earnings based on these observations.
+- [data_bot_sim.py](https://github.com/VinnieMuffinMan/CSE-150A-Project/blob/main/data_bot_sim.py): This simulates games for our agent to show its performance measure by outputting the agent's balance after a given number of games.
 
 ** Conclusion section: What is the conclusion of your 1st model? What can be done to possibly improve it? **<br/>
 This first model performs well overall, maintaining a fairly consistent balance throughout the games. Improving the model would most likely involve generating more observations to increase the precision of expected values.
