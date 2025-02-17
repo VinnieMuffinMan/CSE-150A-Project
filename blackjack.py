@@ -9,6 +9,7 @@ class Blackjack:
         self.player = []
         self.dealer = []
         self.bal = bal
+        self.bet = 1
 
     def deal(self):
         self.player = []
@@ -17,7 +18,7 @@ class Blackjack:
         self.dealer.append(self.deck.draw())
         self.player.append(self.deck.draw())
         self.dealer.append(self.deck.draw())
-        self.bal -= 1
+        self.bal -= self.bet
 
     def player_score(self):
         sc, ace = score(self.player)
@@ -36,7 +37,7 @@ class Blackjack:
         return self.player_draw()
 
     def player_double(self):
-        self.bal -= 1
+        self.bal -= self.bet
         return self.player_draw()
 
     def cards_left(self):
@@ -66,29 +67,25 @@ class Blackjack:
             dealer_score, ace = self.dealer_score()
 
     def game(self):
-        if self.deck.check():
-            self.deck = Deck(decks=self.deck.decks, pen=self.deck.pen, burn=True)
+        if self.check_deck_pen():
             print("Shuffling...")
-            self.deck.shuffle()
-
         self.deal()
-        print(
-            f"Player: {self.player} ({self.player_score()[0]}) Bal: {self.bal}"
-        )
-        if self.player_score()[0] == 21:
-            if self.dealer_score()[0] == 21:
-                print(f"Dealer: {self.dealer} ({self.dealer_score()[0]})")
-                print("It's a tie.")
-                self.bal += 1
-            else:
-                print(f"Dealer: {self.dealer[0]}")
-                print("Player wins.")
-                self.bal += 2.5
+        print(f"Player: {self.player} ({self.player_score()[0]}) Bal: {self.bal}")
+
+        start_check = self.start_check()
+        if start_check == 1:
+            print(f"Dealer: {self.dealer}")
+            print("Player blackjack.")
             return
-        if self.dealer_score()[0] == 21:
+        if start_check == 2:
+            print(f"Dealer: {self.dealer}")
+            print("Dealer blackjack.")
+            return
+        if start_check == 3:
             print(f"Dealer: {self.dealer} ({self.dealer_score()[0]})")
-            print("Dealer wins.")
+            print("It's a tie.")
             return
+
         print(f"Dealer: {self.dealer[0]}")
 
         while True:
@@ -99,26 +96,77 @@ class Blackjack:
             print(f"Player: {self.player} ({self.player_score()[0]})")
             print(f"Dealer: {self.dealer[0]}")
 
-        if self.player_score()[0] > 21:
+        end = self.end_check(act)
+        print(f"Dealer: {self.dealer} ({self.dealer_score()[0]})")
+
+        match end:
+            case 0:
+                print("Player wins.")
+            case 1:
+                print("Dealer wins.")
+            case 2:
+                print("It's a tie.")
+            case 3:
+                print("Player busts! Dealer wins.")
+            case 4:
+                print("Dealer busts! Player wins.")
+
+    def check_deck_pen(self):
+        """
+        Checks if the deck is sufficiently depleted.
+
+        Returns:
+            bool: True if shuffling, False otherwise.
+        """
+        if self.deck.check():
+            self.deck = Deck(decks=self.deck.decks, pen=self.deck.pen, burn=True)
+            self.deck.shuffle()
+            return True
+        return False
+
+    def start_check(self):
+        """
+        Checks for blackjacks at start of game.
+
+        Returns:
+            int: 1 if player blackjack, 2 if dealer blackjack, 3 if tie, 0 otherwise.
+        """
+        if self.player_score()[0] == 21:
+            if self.dealer_score()[0] == 21:
+                self.bal += self.bet
+                return 3
+            else:
+                self.bal += 2.5 * self.bet
+                return 1
+        if self.dealer_score()[0] == 21:
+            return 2
+        return 0
+
+    def end_check(self, act):
+        """
+        Checks winner of the game.
+
+        Returns:
+            int: 0 if player wins, 1 if dealer wins, 2 if tie, 3 if player busts, 4 if dealer busts.
+        """
+        player_score, _ = self.player_score()
+        if player_score > 21:
             print("Player busts! Dealer wins.")
-            return
+            return 3
 
         self.dealer_action()
+        dealer_score, _ = self.dealer_score()
 
-        print(f"Dealer: {self.dealer} ({self.dealer_score()[0]})")
-        if self.dealer_score()[0] > 21:
-            print("Dealer busts! Player wins.")
-            self.bal += 4 if act == 2 else 2
-            return
-
-        if self.player_score()[0] > self.dealer_score()[0]:
-            self.bal += 4 if act == 2 else 2
-            print("Player wins.")
-        elif self.player_score()[0] < self.dealer_score()[0]:
-            print("Dealer wins.")
-        else:
-            print("It's a tie.")
-            self.bal += 2 if act == 2 else 1
+        if dealer_score > 21:
+            self.bal += (4 if act == 2 else 2) * self.bet
+            return 4
+        if player_score > dealer_score:
+            self.bal += (4 if act == 2 else 2) * self.bet
+            return 0
+        if player_score < dealer_score:
+            return 1
+        self.bal += (2 if act == 2 else 1) * self.bet
+        return 2
 
 
 class Deck:
