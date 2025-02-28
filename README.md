@@ -36,6 +36,8 @@ The following are the main scripts that we implemented throughout the process of
 - [data_bot_sim.py](https://github.com/VinnieMuffinMan/CSE-150A-Project/blob/Milestone2/data_bot_sim.py): This simulates games for our agent to show its performance measure by outputting the agent's balance after a given number of games.
 
 ** Conclusion section: What is the conclusion of your 1st model? What can be done to possibly improve it? **<br/>
-Our model is evaluated by the player's balance after a number of games, a higher balance indicating better performance (a positive final balance would be ideal). Overall, the model performed decently but could definitely be improved as evidenced by the negative balance after 200 games as shown in the graph below: 
+Our model is evaluated by the player's balance after a number of games, a higher balance indicating better performance (a positive final balance would be ideal). Overall, the model performed decently but could definitely be improved as evidenced by the negative balance after 200 games as shown in the graph below:
+
 ![evaluation](balance_seed_0.png)
+
 The model did well with making the right decisions: we compared the expected values for each decision that it calculated with those calculated in bot.py (which finds the true expected values) and found that they often agreed on which action had the highest expected value. The model also did well with generating observations, only considering those that match the current game state so that it rejects irrelevant data. However, the model is limited by the number of observations it generates and its lack of variable betting, causing it to perform suboptimally. Improving the model would most likely involve generating more observations to increase the precision of expected values as well as adding some kind of variable betting to allow for more advantage play.
