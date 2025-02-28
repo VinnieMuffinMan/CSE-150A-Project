@@ -35,4 +35,4 @@ The following are the main scripts that we implemented throughout the process of
 - [data_bot_sim.py](https://github.com/VinnieMuffinMan/CSE-150A-Project/blob/Milestone2/data_bot_sim.py): This simulates games for our agent to show its performance measure by outputting the agent's balance after a given number of games.
 
 ** Conclusion section: What is the conclusion of your 1st model? What can be done to possibly improve it? **<br/>
-This first model performs well overall, maintaining a fairly consistent balance throughout the games. Improving the model would most likely involve generating more observations to increase the precision of expected values.
+This first model performs well overall, maintaining a fairly consistent balance throughout the games. Improving the model would most likely involve generating more observations to increase the precision of expected values. We could also add some kind of variable betting to allow for more advantage play.
