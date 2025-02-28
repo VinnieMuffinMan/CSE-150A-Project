@@ -1,6 +1,6 @@
 # Milestone 2 Writeup
 
-[UPDATED DIAGRAM](#describe-how-your-agent-is-set-up-and-where-it-fits-in-probabilistic-modeling)
+[UPDATED DIAGRAM](#describe-how-your-agent-is-set-up-and-where-it-fits-in-probabilistic-modeling)<br/>
 [UPDATED CONCLUSION](#conclusion-section-what-is-the-conclusion-of-your-1st-model-what-can-be-done-to-possibly-improve-it)
 
 ### Explain what your AI agent does in terms of PEAS. What is the "world" like?
@@ -10,7 +10,7 @@ The world that the AI agent resides is where the agent is a Blackjack player tha
 Our agent is utility based because it chooses the most effective options in achieving the goal of maximizing earnings.
 
 ### Describe how your agent is set up and where it fits in probabilistic modeling
-** Update: ** Our agent's functionality is found in data_bot.py. The game is set up according to the network below: 
+**Update:** Our agent's functionality is found in data_bot.py. The game is set up according to the network below: 
 ![diagram](CSE150A-GP.png)
 The state variable is the current game state (which consists of the dealer's hand, the player's hand, and the remaining cards in the deck). The action variable is what the player chooses to do (hit, stand, double, split, surrender). The win variable is a binary node where 1 indicates the player wins the game and 0 indicates the player loses. 
 The state variable influences the action variable by determining which action is most likely to result in a win: 
@@ -39,7 +39,7 @@ The following are the main scripts that we implemented throughout the process of
 - [data_bot_sim.py](https://github.com/VinnieMuffinMan/CSE-150A-Project/blob/Milestone2/data_bot_sim.py): This simulates games for our agent to show its performance measure by outputting the agent's balance after a given number of games.
 
 ### Conclusion section: What is the conclusion of your 1st model? What can be done to possibly improve it?
-** Update: ** Our model is evaluated by the player's balance after a number of games, a higher balance indicating better performance (a positive final balance would be ideal). Overall, the model performed decently but could definitely be improved as evidenced by the negative balance after 200 games as shown in the graph below:
+**Update:** Our model is evaluated by the player's balance after a number of games, a higher balance indicating better performance (a positive final balance would be ideal). Overall, the model performed decently but could definitely be improved as evidenced by the negative balance after 200 games as shown in the graph below:
 
 ![evaluation](balance_seed_0.png)
 
