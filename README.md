@@ -11,9 +11,9 @@ Our agent's functionality is found in data_bot.py. The game is set up according 
 ![diagram](CSE150A-GP.png)
 The state variable is the current game state (which consists of the dealer's hand, the player's hand, and the remaining cards in the deck). The action variable is what the player chooses to do (hit, stand, double, split, surrender). The win variable is a binary node where 1 indicates the player wins the game and 0 indicates the player loses. 
 The state variable influences the action variable by determining which action is most likely to result in a win: 
-1. The dealer's hand tells the player what the dealer's score could most likely be, indicating whether the player should play against that hand.
-2. The player's hand tells the player what the player's score could most likely be, indicating whether the player should stand or take further action.
-3. The remaining cards in the deck tells the player what possible cards the dealer or player can draw, indicating what either hand could possibly be.<br/>
+- The dealer's hand tells the player what the dealer's score could most likely be, indicating whether the player should play against that hand.
+- The player's hand tells the player what the player's score could most likely be, indicating whether the player should stand or take further action.
+- The remaining cards in the deck tells the player what possible cards the dealer or player can draw, indicating what either hand could possibly be.
 The state and action variables affect the win variable by determining how the game plays out. The state can indicate what either hand could possibly be, and the action could either increase or decrease the chances of winning.
 This network is modeled in the action function, which takes the current game state as input and generates a large number of possible decks that match the not-seen cards in the state. From this set of possible decks, it creates a dataset of observations by performing possible actions on the deck (hit, stand, etc) and recording their outcomes. The agent chooses the action A that maximizes the chance of winning a game, i.e. the action with the most observations where the player won.
 
