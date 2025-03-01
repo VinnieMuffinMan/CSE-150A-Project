@@ -13,7 +13,7 @@ def create_and_shuffle_decks(cards, count):
     Creates multiple decks, shuffles them, and returns them as a list.
     
     Args:
-        cards (array-like): The set of cards to be used for deck creation.
+        cards (np.ndarray): The set of cards to be used for deck creation (index 0 = A, index 1 = 2, ..., index 9 = 10 + face cards).
         count (int): The number of decks to create.
     
     Returns:
@@ -30,7 +30,7 @@ def __generate_decks(not_seen, count=5000, num_workers=None):
     Generates a number of shuffled decks using multiprocessing.
     
     Args:
-        not_seen (np.ndarray): The remaining unseen cards in the game.
+        not_seen (np.ndarray): The remaining unseen cards in the game (index 0 = A, index 1 = 2, ..., index 9 = 10 + face cards).
         count (int, optional): Number of decks to generate (default: 5000).
         num_workers (int, optional): Number of parallel workers for multiprocessing.
     

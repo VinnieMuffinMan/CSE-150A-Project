@@ -4,6 +4,16 @@ from bj_utils import score
 
 class Blackjack:
     def __init__(self, decks=8, pen=0.8125, burn=False, seed=None, bal=0):
+        """
+        Initializes the Blackjack game.
+
+        Args:
+            decks (int, optional): Number of decks used (default: 8).
+            pen (float, optional): Penetration percentage before reshuffling (default: 0.8125).
+            burn (bool, optional): Whether to burn a card after shuffling (default: False).
+            seed (int, optional): Random seed for deck shuffling.
+            bal (float, optional): Player's starting balance (default: 0).
+        """
         self.deck = Deck(decks=decks, seed=seed)
         self.deck.shuffle()
         self.player = []
@@ -15,6 +25,9 @@ class Blackjack:
         self.bet = 1
 
     def deal(self):
+        """
+        Deals two cards to both player and dealer and adjusts the balance by the bet.
+        """
         self.player = []
         self.dealer = []
         self.split_hands = []
@@ -25,37 +38,85 @@ class Blackjack:
         self.bal -= self.bet
 
     def player_score(self):
+        """
+        Calculates the player's hand score.
+
+        Returns:
+            tuple: The player's score and the number of aces in hand.
+        """
         sc, ace = score(self.player)
         return sc, ace
 
     def dealer_score(self):
+        """
+        Calculates the dealer's hand score.
+
+        Returns:
+            tuple: The dealer's score and the number of aces in hand.
+        """
         sc, ace = score(self.dealer)
         return sc, ace
 
     def player_draw(self):
+        """
+        Draws a card for the player.
+
+        Returns:
+            int: The drawn card.
+        """
         card = self.deck.draw()
         self.player.append(card)
         return card
 
     def hit(self):
+        """
+        Allows player to hit by drawing a card.
+
+        Returns:
+            int: The drawn card.
+        """
         return self.player_draw()
 
     def double(self):
+        """
+        Doubles the bet and draws a card for the player.
+
+        Returns:
+            int: The drawn card.
+        """
         self.bal -= self.bet
         return self.player_draw()
 
     def split(self):
+        """
+        Splits the player's hand into two hands.
+        """
         self.bal -= self.bet
         self.split_hands.append([self.player[0]])
         self.split_hands.append([self.player[0]])
 
     def surrender(self):
+        """
+        Allows player to surrender this game.
+        """
         self.bal += 0.5 * self.bet
 
     def cards_left(self):
+        """
+        Returns the number of cards left in the deck.
+
+        Returns:
+            int: The number of cards left in the deck.
+        """
         return len(self.deck)
 
     def player_action(self, action):
+        """
+        Maps the given action to an integer.
+
+        Returns:
+            int: 0 for hit, 1 for stand, 2 for double, 3 for split, -1 for surrender.
+        """
         match action:
             case "hit":
                 self.hit()
@@ -74,12 +135,18 @@ class Blackjack:
                 raise ValueError("Invalid action")
 
     def dealer_action(self):
+        """
+        Draws cards for the dealer until they score at least 17.
+        """
         dealer_score, ace = self.dealer_score()
         while dealer_score < 17 or (dealer_score == 17 and ace):
             self.dealer.append(self.deck.draw())
             dealer_score, ace = self.dealer_score()
 
     def game(self):
+        """
+        Allows user to play a game of blackjack (our model plays this in data_bot_sim.py).
+        """
         if self.check_deck_pen():
             print("Shuffling...")
         self.deal()
@@ -236,6 +303,16 @@ class Blackjack:
 
 class Deck:
     def __init__(self, cards=None, decks=8, pen=0.8125, burn=False, seed=None):
+        """
+        Initializes a deck of cards.
+
+        Args:
+            cards (np.ndarray, optional): List of cards (index 0 = A, index 1 = 2, ..., index 9 = 10 + face cards).
+            decks (int, optional): Number of decks used.
+            pen (float, optional): Penetration percentage before reshuffling.
+            burn (bool, optional): Whether to burn a card after shuffling.
+            seed (int, optional): Random seed for shuffling.
+        """
         if cards is None:
             cards = np.array([i for i in range(1, 14) for _ in range(4 * decks)])
         else:
@@ -249,12 +326,24 @@ class Deck:
         self.pos = 52 * self.decks - 1
 
     def shuffle(self, burn=False):
+        """
+        Shuffles the deck and optionally burns a card.
+
+        Args:
+            burn (bool, optional): Whether to burn a card after shuffling.
+        """
         np.random.shuffle(self.cards)
         self.pos = len(self.cards) - 1
         if burn:
             self.draw()
 
     def draw(self):
+        """
+        Draws a card from the deck.
+
+        Returns:
+            int: The drawn card.
+        """
         if self.pos < 0:
             raise IndexError("No cards left in the deck.")
         card = self.cards[self.pos]
@@ -262,12 +351,30 @@ class Deck:
         return card
 
     def peek(self):
+        """
+        Returns the top card of the deck without drawing it.
+
+        Returns:
+            int: The top card.
+        """
         if self.pos < 0:
             raise IndexError("No cards left in the deck.")
         return self.cards[self.pos]
 
     def __len__(self):
+        """
+        Returns the number of remaining cards in the deck.
+
+        Returns:
+            int: The number of remaining cards in the deck.
+        """
         return self.pos + 1
 
     def check(self):
+        """
+        Checks if the deck has reached the reshuffle penetration point.
+
+        Returns:
+            bool: True if reshuffling is needed, False otherwise.
+        """
         return len(self) < len(self.cards) * (1 - self.pen)
