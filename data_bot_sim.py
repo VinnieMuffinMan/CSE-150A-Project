@@ -5,22 +5,38 @@ import matplotlib.pyplot as plt
 
 
 def simulate(seed=None,num_games=100):
+    """
+    Simulates a number of Blackjack games using the model in data_bot.py to play.
+
+    Args:
+        seed (int, optional): Seed for deterministic games.
+        num_games (int, optional): Number of blackjack games to simulate (default: 100).
+
+    Saves:
+        A plot of the player's balance over the number of games played.
+    """
+    # Initialize the game and its state
     game = Blackjack(seed=seed)
     state = State(burn=False)
     games, bals = range(num_games + 1), []
+
     for i in range(num_games):
         print("_" * 50)
         print(f"Game {i+1}")
         print("Bal:", game.bal)
         bals.append(game.bal)
+
+        # Check if deck needs to be reshuffled
         if game.check_deck_pen():
             print("Shuffling...")
             state.not_seen_reset()
+
         game.deal()
         print(game.player)
         print(game.dealer)
         state.update_hand(game.player, game.dealer[:1])
 
+        # Check for immediate blackjacks
         start = game.start_check()
         if start != 0:
             state.update_dealer_hand(game.dealer[1:])
@@ -37,6 +53,7 @@ def simulate(seed=None,num_games=100):
             print("It's a tie.")
             continue
 
+        # Determine best action for the given hand
         while True:
             act, ev = action(state)
             print(ev)
@@ -60,6 +77,7 @@ def simulate(seed=None,num_games=100):
             print(f"Player: {game.player} ({game.player_score()[0]})")
             print(f"Dealer: {game.dealer[0]}")
 
+        # Handle splitting (same loop as above but for both split hands)
         if act == "split":
             i = 0
             while i < len(game.split_hands):
@@ -98,6 +116,7 @@ def simulate(seed=None,num_games=100):
                     print(f"Dealer: {game.dealer[0]}")
                 i += 1
 
+            # Evaluate outcome for both split hands
             dealer_drawn = False
             for i in range(len(game.split_hands)):
                 game.player = game.split_hands[i]
@@ -127,6 +146,7 @@ def simulate(seed=None,num_games=100):
             state.update_dealer_hand(game.dealer[1:])
             continue
 
+        # Determines winner of the game
         act = 2 if act == "double" else 1
         end = game.end_check(act)
         print(f"Dealer: {game.dealer} ({game.dealer_score()[0]})")
@@ -144,6 +164,7 @@ def simulate(seed=None,num_games=100):
                 print("Dealer busts! Player wins.")
         state.update_dealer_hand(game.dealer[1:])
 
+    # Saves the player's balance over the number of games played to a plot
     print(f"Won {game.bal} over {num_games} games.")
     bals.append(game.bal)
     plt.plot(games, bals)
