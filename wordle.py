@@ -1,40 +1,27 @@
-import numpy as np
+import random
+from wordle_utils import get_feedback
 
 class Wordle:
     def __init__(self, seed=None):
-        self.words = np.genfromtxt('wordle_word_list.txt', dtype='str')
-        self.sol_words = np.genfromtxt('wordle_sol_list.txt', dtype='str')
+        self.words = set()
+        with open("wordle_word_list.txt", "r") as f:
+            for line in f:
+                self.words.add(line.strip())
+        self.sol_words = set()
+        with open("wordle_sol_list.txt", "r") as f:
+            for line in f:
+                self.sol_words.add(line.strip())
         self.answer = ""
         self.attempts = 6
         if seed is not None:
-            np.random.seed(seed)
+            random.seed(seed)
 
     def get_feedback(self, guess):
-        if len(guess) != 5 or guess not in self.words:
-            return
-        
-        # For returning the correct number of yellow/green squares for each letter
-        answer_counts = {letter: self.answer.count(letter) for letter in set(self.answer)}
-
-        feedback = ["⬜"] * 5
-        for i in range(len(guess)):
-            if guess[i] == self.answer[i]:
-                feedback[i] = "🟩"
-                answer_counts[guess[i]] -= 1
-
-        for i in range(len(guess)):
-            if feedback[i] == "🟩":
-                continue
-            if guess[i] in answer_counts and answer_counts[guess[i]] > 0:
-                feedback[i] = "🟨"
-                answer_counts[guess[i]] -= 1
-
-        feedback = "".join(feedback)
-        return feedback
+        return get_feedback(guess, self.answer, self.words)
 
     def start_game(self):
         print("New game, choosing word...")
-        self.answer = np.random.choice(self.sol_words)
+        self.answer = random.choice(list(self.sol_words))
         self.attempts = 6
 
     def play(self):
