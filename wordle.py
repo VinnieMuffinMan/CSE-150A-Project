@@ -1,6 +1,7 @@
 import random
 from wordle_utils import get_feedback
 
+
 class Wordle:
     def __init__(self, seed=None):
         self.words = set()
@@ -19,13 +20,13 @@ class Wordle:
     def get_feedback(self, guess):
         return get_feedback(guess, self.answer, self.words)
 
-    def start_game(self):
+    def start_game(self, word=None):
         print("New game, choosing word...")
         self.answer = random.choice(list(self.sol_words))
         self.attempts = 6
 
-    def play(self):
-        self.start_game()
+    def play(self, word=None):
+        self.start_game(word=word)
 
         while self.attempts > 0:
             print(f"Attempts left: {self.attempts}")
@@ -42,3 +43,8 @@ class Wordle:
                 return
 
         print(f"Out of attempts, correct word: {self.answer}")
+
+
+if __name__ == "__main__":
+    game = Wordle()
+    game.play(word="trees")
