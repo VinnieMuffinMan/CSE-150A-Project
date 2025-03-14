@@ -1,8 +1,9 @@
 from wordle import Wordle
 from wordle_bot import WordleBot
 
-def simulate(seed=None,num_games=100):
-    wordle = Wordle(seed=seed)
+
+def simulate(const_word=None, num_games=100,hard=False):
+    wordle = Wordle(const_word=const_word,hard=hard)
     bot = WordleBot(wordle.words, wordle.sol_words)
 
     for i in range(num_games):
@@ -19,11 +20,14 @@ def simulate(seed=None,num_games=100):
 
             wordle.attempts -= 1
             print(f"Feedback: {feedback}")
-            if feedback == "🟩🟩🟩🟩🟩":
+            if not feedback:
+                raise ValueError
+            if sum(feedback) == 0:
                 print(f"Successfully guessed: {wordle.answer}")
                 return
 
         print(f"Out of attempts, correct word: {wordle.answer}")
 
+
 if __name__ == "__main__":
-    simulate(seed=0, num_games=1)
+    simulate(const_word=None, num_games=1, hard=True)

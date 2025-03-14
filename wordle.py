@@ -1,9 +1,10 @@
+import numpy as np
 import random
-from wordle_utils import get_feedback
+from wordle_utils import get_feedback_safe
 
 
 class Wordle:
-    def __init__(self, seed=None):
+    def __init__(self, const_word=None, hard=False):
         self.words = set()
         with open("wordle_word_list.txt", "r") as f:
             for line in f:
@@ -12,17 +13,20 @@ class Wordle:
         with open("wordle_sol_list.txt", "r") as f:
             for line in f:
                 self.sol_words.add(line.strip())
+        if hard:
+            self.sol_words = self.words.copy()
         self.answer = ""
         self.attempts = 6
-        if seed is not None:
-            random.seed(seed)
+        self.const_word = const_word
 
     def get_feedback(self, guess):
-        return get_feedback(guess, self.answer, self.words)
+        return get_feedback_safe(guess, self.answer, self.words)
 
     def start_game(self, word=None):
         print("New game, choosing word...")
-        self.answer = random.choice(list(self.sol_words))
+        self.answer = (
+            self.const_word if self.const_word else random.choice(list(self.sol_words))
+        )
         self.attempts = 6
 
     def play(self, word=None):
@@ -38,7 +42,7 @@ class Wordle:
 
             self.attempts -= 1
             print(f"Feedback: {feedback}")
-            if feedback == "🟩🟩🟩🟩🟩":
+            if sum(feedback) == 10:
                 print(f"Successfully guessed: {self.answer}")
                 return
 
