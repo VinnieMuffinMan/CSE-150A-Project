@@ -5,14 +5,11 @@ from wordle_utils import get_feedback_safe
 
 class Wordle:
     def __init__(self, const_word=None, hard=False):
-        self.words = set()
         with open("wordle_word_list.txt", "r") as f:
-            for line in f:
-                self.words.add(line.strip())
-        self.sol_words = set()
+            self.words = [line.strip() for line in f]
+
         with open("wordle_sol_list.txt", "r") as f:
-            for line in f:
-                self.sol_words.add(line.strip())
+            self.sol_words = [line.strip() for line in f]
         if hard:
             self.sol_words = self.words.copy()
         self.answer = ""
@@ -23,7 +20,7 @@ class Wordle:
         return get_feedback_safe(guess, self.answer, self.words)
 
     def start_game(self, word=None):
-        print("New game, choosing word...")
+        # print("New game, choosing word...")
         self.answer = (
             self.const_word if self.const_word else random.choice(list(self.sol_words))
         )
