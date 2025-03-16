@@ -1,15 +1,21 @@
 # Milestone 2 Writeup
 
-[UPDATED DIAGRAM](#describe-how-your-agent-is-set-up-and-where-it-fits-in-probabilistic-modeling)<br/>
-[UPDATED EXPLANATION OF MODEL](#train-your-first-model)<br/>
-[UPDATED EVALUATION OF MODEL](#evaluate-your-model)<br/>
-[UPDATED CONCLUSION](#conclusion-section-what-is-the-conclusion-of-your-1st-model-what-can-be-done-to-possibly-improve-it)
+### Describe your agent in terms of PEAS and give a background of your task at hand.
+The task for this milestone was to create an agent that uses probabilistic concepts to determine the best five-letter words to guess in games of Wordle. The agent's performance measure is the amount of Wordle games that the agent wins. Its environment is a five-letter input space where the agent can input five-letter words and receive feedback for each letter. The agent's "actuators" choose the five-letter word that maximizes the amount of information we need to find the answer word. The agent's "sensors" sense the feedback that the game gives for its guesses, i.e. whether a letter is in the right place, in the word, or not in the word at all.
 
-### Explain what your AI agent does in terms of PEAS. What is the "world" like?
-The world that the AI agent resides is where the agent is a Blackjack player that aims to maximize their earnings (the performance measure). The world uses an 8-deck size shoe and for each game, it randomly chooses starting hands from this shoe for the dealer and our agent (the environment). Our agent's "sensors" sense the current game state, which consists of the dealer's visible card, the agent's hand, and the cards that we haven't seen based on previous games (i.e. our agent incorporates card counting). Based on the current game state and a large number of observations relevant to that state (i.e. our dataset), the agent's "actuators" chooses the optimal move (hit, stand, double, split, or surrender).
+### Give an exploration of your dataset, and highlight which variables are important. Give a brief overview of each variable and its role in your agent/model. (Draw a picture!!)
+Our dataset is generated in `precompute_feedback` in `wordle_utils.py`; this function loops through all possible 5-letter words (found in `wordle_word_list.txt`), using each one as a guess against every possible 5-letter word and obtaining the feedback for the guess using `get_feedback`. The function saves all of these observations to `feedback_matrix.npy`, which is used to calculate probabilities.
 
-### What kind of agent is it? Goal based? Utility based? etc.
-Our agent is utility based because it chooses the most effective options in achieving the goal of maximizing earnings.
+The primary variables are the word we are trying to guess (**W**), the guesses that the agent makes (**G_i**), and the feedback that the game gives for each guess (**F_i**). Our **W** variable serves as the goal of our model, our **G_i** variables are the model's actions, and the **F_i** variables are the information that the model uses to make better decisions. These variables and their relationships are shown in the diagram below:
+![diagram](CSE150A-GP-M3.png)
+
+### Describe in detail how your variables interact with each other, and if your model fits a particular structure, explain why you chose that structure to model your agent. If it does not, further elaborate on why you chose that model based on the variables.
+At the start of each game, our target five-letter word **W** is chosen at random (unless explicitly chosen using the `const_word` parameter in our `Wordle` game) and influences our **F_i** variables by determining how accurate each guess is. Each action our agent makes is a **G_i** variable, i.e. a five-letter word; for all i from 1 to 6 (since we have 6 total guesses), **G_i** influences **F_i** because the feedback reflects how accurate the guess is in comparison to the answer word. Once our agent guesses, the game computes the **F_i** variable, a list of five integers (0 = letter is not in the word, 1 = letter is in the word but in a different place, 2 = letter is correct). For all i from 1 to 5 (we exclude 6 since that is our final guess, so the game is over), **F_i** influences **G_{i+1}** because the feedback narrows down the words that could possibly be the answer, meaning **G_{i+1}** will only be a word from this subset of possible words.
+
+### Describe your process for calculating parameters in your model. That is, if you wish to find the CPTs, provide formulas as to how you computed them. If you used algorithms in class, just mention them.
+To be completed
+
+### END OF NEW README, WILL ADD MORE LATER
 
 ### Describe how your agent is set up and where it fits in probabilistic modeling
 **Update:** The agent is set up according to the network below: 
