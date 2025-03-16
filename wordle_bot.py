@@ -9,12 +9,13 @@ class WordleBot:
         self.guessable = guessable.copy()
         self.guessable = sorted(self.guessable)
         self.guessable_index = np.arange(len(self.guessable))
-        self.remaining = remaining.copy()
-        self.remaining = sorted(self.remaining)
-        self.remaining_index = np.arange(len(self.remaining))
         self.lookup = np.load("feedback_matrix.npy")
         self.word_index = {word: i for i, word in enumerate(self.guessable)}
         self.index_word = np.array(self.guessable)
+
+        self.remaining = remaining.copy()
+        self.remaining = sorted(self.remaining)
+        self.remaining_index = np.array([self.word_index[word] for word in self.remaining])
 
     def reset(self, guessable, remaining):
         self.guessable = guessable
@@ -60,7 +61,7 @@ class WordleBot:
         max_i = np.argmax(eval_words)
         return words_index[max_i]
 
-    def action(self, guess_history, debug=False):
+    def action(self, guess_history, debug=False, first=None):
         self.remaining_index = np.array(
             [wi for wi in self.remaining_index if self.fits_info(wi, guess_history)]
         )
@@ -68,8 +69,8 @@ class WordleBot:
             print(self.index_word[self.guessable_index])
             print(len(self.remaining_index))
             print(self.index_word[self.remaining_index])
-        if len(guess_history) == 0:
-            guess = self.word_index["tares"]
+        if first and len(guess_history) == 0:
+            guess = self.word_index[first]
         elif len(self.remaining_index) == 1:
             guess = self.remaining_index[0]
         else:
