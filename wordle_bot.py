@@ -16,6 +16,9 @@ class WordleBot:
         self.remaining = remaining.copy()
         self.remaining = sorted(self.remaining)
         self.remaining_index = np.array([self.word_index[word] for word in self.remaining])
+        with open('wordle_sol_list.txt', 'r') as f:
+            sol_words = [line.strip() for line in f]
+        self.frequencies = np.array([4 if word in sol_words else 1 for word in self.guessable])
 
     def reset(self, guessable, remaining):
         self.guessable = guessable
@@ -35,9 +38,9 @@ class WordleBot:
             feedback = get_feedback_from_index(wi, ai, self.lookup)
             possible[
                 feedback[0], feedback[1], feedback[2], feedback[3], feedback[4]
-            ] += 1
+            ] += self.frequencies[wi]
 
-        possible /= len(answers)
+        possible /= sum(self.frequencies[ai] for ai in answers)
         exp = 0
 
         for value in possible.flatten():

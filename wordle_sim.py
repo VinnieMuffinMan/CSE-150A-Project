@@ -53,11 +53,11 @@ if __name__ == "__main__":
 
     with open("wordle_sol_list.txt", "r") as f:
         words = [line.strip() for line in f]
+    num_games = len(words)
     game_stats = [simulate(const_word=w, first="tarse") for w in tqdm(words)]
     avg = sum(game_stats) / len(game_stats)
     won = 0
     loss = 0
-    games = range(num_games+1)
     attempts = []
     for i in game_stats:
         if i == 0:
@@ -67,11 +67,12 @@ if __name__ == "__main__":
             won += 1
             attempts.append(i)
 
-    plt.plot(games, [0] + attempts)
-    plt.xlabel("Games")
-    plt.ylabel("Attempts")
-    plt.title(f"Number of Attempts Per Game ({num_games} Games)")
-    plt.savefig(f"num_attempts_games_{num_games}.png")
+    plt.hist(attempts, bins=[0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5], edgecolor='black', align='mid')
+    plt.xticks(range(1, 7))
+    plt.xlabel('Attempts')
+    plt.ylabel('Number of Games')
+    plt.title(f'Distribution of Attempts Per Game ({num_games} Games)')
+    plt.savefig(f"num_attempts_{num_games}_games.png")
 
     print(f"Won: {won}, Loss: {loss}")
     print(f"Win rate: {won / len(game_stats) * 100:.2f}%")
