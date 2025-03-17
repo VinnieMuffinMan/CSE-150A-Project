@@ -1,4 +1,4 @@
-# Milestone 2 Writeup
+# Milestone 3 Writeup
 
 ## PEAS/Agent Analysis
 ### Describe your agent in terms of PEAS and give a background of your task at hand.
