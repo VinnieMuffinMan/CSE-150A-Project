@@ -1,4 +1,3 @@
-import math
 import numpy as np
 from tqdm import tqdm
 from wordle_utils import get_feedback_from_index
@@ -6,6 +5,13 @@ from wordle_utils import get_feedback_from_index
 
 class WordleBot:
     def __init__(self, guessable, remaining):
+        """
+        Initializes the Wordle agent.
+
+        Args:
+            guessable (list[string]): List of all valid 5-letter words to guess in Wordle.
+            remaining (list[string]): List of all possible answer words in Wordle.
+        """
         self.guessable = guessable.copy()
         self.guessable = sorted(self.guessable)
         self.guessable_index = np.arange(len(self.guessable))
@@ -21,10 +27,26 @@ class WordleBot:
         self.frequencies = np.array([4 if word in sol_words else 1 for word in self.guessable])
 
     def reset(self, guessable, remaining):
+        """
+        Resets the agent's lists of guessable and remaining words.
+
+        Args:
+            guessable (list[string]): List of all valid 5-letter words to guess in Wordle.
+            remaining (list[string]): List of all possible answer words in Wordle.
+        """
         self.guessable = guessable
         self.remaining = remaining
 
     def fits_info(self, i, guess_history):
+        """
+        Determines whether the answer word (given by index) fits all previous feedback.
+
+        Args:
+            i (int): Index of the answer word that is checked for fitting the feedback.
+            guess_history (list[tuple]): List of tuples that contains the agent's previous guesses and their corresponding feedbacks.
+        Returns:
+            bool: True if the answer word fits the guess history, False otherwise.
+        """
         for guess, feedback in guess_history:
             new_feedback = get_feedback_from_index(
                 self.word_index[guess], i, self.lookup
@@ -34,6 +56,16 @@ class WordleBot:
         return True
 
     def get_information(self, wi, answers, possible):
+        """
+        Calculates the amount of information given by the word (given by index).
+
+        Args:
+            wi (int): Index of the guess word whose parameter is being calculated.
+            answers (np.ndarray): Array of indices of possible answer words we are comparing the guess against.
+            possible (np.ndarray): Array of all possible feedbacks (all length-5 list combinations of 0s, 1s, and 2s).
+        Returns:
+            float: Entropy of the feedback of the given guess word.
+        """
         for ai in answers:
             feedback = get_feedback_from_index(wi, ai, self.lookup)
             possible[
@@ -50,6 +82,16 @@ class WordleBot:
         return exp
 
     def evaluate_words(self, remaining_index, words_index, debug=False):
+        """
+        Returns the index of the word that gives us the most information to find the answer.
+
+        Args:
+            remaining_index (np.ndarray): Array of indices of possible answer words.
+            words_index (np.ndarray): Array of indices of all 5-letter words.
+            debug (bool, optional): Prints calculated parameters if True.
+        Returns:
+            int: Index of the word with the highest entropy value.
+        """
         possible_zeros = np.zeros((len(self.guessable), 3, 3, 3, 3, 3))
         if debug:
             eval_words = [
@@ -65,6 +107,16 @@ class WordleBot:
         return words_index[max_i]
 
     def action(self, guess_history, debug=False, first=None):
+        """
+        Returns the word that gives us the most information to find the answer.
+
+        Args:
+            guess_history (list[tuple]): List of tuples that contains the agent's previous guesses and their corresponding feedbacks.
+            debug (bool, optional): Prints words at certain indices if True.
+            first (string, optional): Automatically chooses the first guess of the game if not None.
+        Returns:
+            string: Word that the agent chooses as its next guess.
+        """
         self.remaining_index = np.array(
             [wi for wi in self.remaining_index if self.fits_info(wi, guess_history)]
         )
